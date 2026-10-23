@@ -1,43 +1,22 @@
 # Local Task Manager — IT 126
+## Reflection
 
-A simple one-screen Flutter application using SQLite (`sqflite`) and a repository.
+### 1. Why does the application use SQLite instead of relying only on a Dart list?
 
-## Requirements
-- Flutter SDK installed
-- Android Studio or VS Code with Flutter/Dart extensions
-- Android emulator or Android device for running the SQLite app
+The application uses SQLite to save tasks permanently on the device. A Dart list only stores tasks in memory while the application is running. SQLite allows saved tasks to remain available even after the application is closed and reopened.
 
-## Run the project
-1. Extract this ZIP file.
-2. Open the `local_task_manager` folder in VS Code.
-3. Open the terminal in that folder.
-4. Run:
-   ```bash
-   flutter pub get
-   flutter run
-   ```
+### 2. What is the purpose of the primary key in the tasks table?
 
-If you are starting from a newly created Flutter project instead, create it with
-`flutter create local_task_manager`, then replace its `pubspec.yaml` and `lib`
-files with the files in this package.
+The `id` column serves as the primary key. It automatically generates a unique ID for every task, allowing the application to identify the correct task when updating its completion status or deleting it, even if two tasks have the same title.
 
-## Files
-- `lib/main.dart` — user interface, input validation, loading, feedback, and refreshing.
-- `lib/models/task.dart` — converts a database row into a Task object.
-- `lib/database/task_repository.dart` — creates the database and performs Create, Read, Update, and Delete operations.
-- `pubspec.yaml` — dependencies, including `sqflite` and `path`.
+### 3. How does the repository simplify the UI's interaction with the database?
 
-## Database
-The database is stored locally as `tasks.db`. The `tasks` table contains:
-- `id`: auto-incrementing primary key
-- `title`: task title
-- `is_completed`: `0` for pending and `1` for completed
+The `TaskRepository` class organizes database operations in a separate file. The UI calls repository methods to add, retrieve, update, and delete tasks instead of executing database queries directly. This makes the code easier to understand, maintain, and manage.
 
-## Test persistence
-1. Add a task.
-2. Close/stop the app, then launch it again.
-3. Confirm the task is still displayed.
-4. Mark it completed and confirm its status remains after restarting.
-5. Delete a task and confirm it does not return after restarting.
+### 4. What would happen if a task were removed from the displayed list but not deleted from SQLite?
 
-The database is local to the device/emulator. Uninstalling the app may remove its local database.
+The task would disappear from the screen temporarily, but its record would remain in the database. When the application reloads the saved tasks, the task would appear again. Therefore, the application must delete the record from SQLite before refreshing the displayed list.
+
+### 5. If the database schema later needed a new column for task priority, what parts of the application might need to change?
+
+The database table would need a new `priority` column, and the database version and migration logic might need to be updated. The `Task` model would need a priority property, and the repository would need to save and retrieve the priority value. The UI would also need a way to select and display each task's priority. These changes would allow the application to manage task priorities while preserving existing records.
